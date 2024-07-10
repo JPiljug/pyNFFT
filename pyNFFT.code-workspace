@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "../testNFFT3"
+        },
+        {
+            "path": "."
+        },
+        {
+            "path": "../NFFT3.jl"
+        }
+    ]
+}
