@@ -24,9 +24,9 @@ X = np.random.rand(M,)
 fhat = np.random.rand(N[0]) +  1.0j * np.random.rand(N[0])
 
 # initialize a NFFT plan and set data
-plan = nfft.NFFT(N,M)
+plan = nfft3.NFFT(N,M)
 plan.X = X
-plan.f = f 
+plan.fhat = fhat 
 
 # perform the NFFT transformation
 plan.trafo()

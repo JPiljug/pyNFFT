@@ -1,37 +1,16 @@
 import ctypes as ct
 import numpy as np
-import os 
-import sys
 
-import flags
-
-# Check loading path, compatibility with ide for comfort pasting 
-if '__file__' not in globals():
-    _dir_path = os.path.dirname(os.path.realpath((__name__)))
-else:
-    _dir_path = os.path.abspath(os.path.dirname(__file__))
-
-# @TODO: check for avx support -> linux 'grep avx /proc/cpuinfo' possible but in general python tricky
-# there is something like cpuinfo , but that is not in general python
-
-# Check os and load data
-if sys.platform == 'linux':
-    _path_to_file = '/libnfftjuliaavx.so'
-elif sys.platform == 'win32':
-    _path_to_file = '/libnfftjuliaavx.dll'
-    raise RuntimeError("Not supported yet")
-elif sys.platform == 'darwin':
-    _path_to_file = '/libnfftjuliaavx.dylib'
-    raise RuntimeError("Not supported yet")
-else:
-    raise RuntimeError("Operating System not supported.")
-
-_libnfft = ct.CDLL(_dir_path  + _path_to_file)   
+from .. import flags
+from .. import _init_paths
 
 # Define  dummy structure for C nfft_plan
 class _NfftPlan(ct.Structure):
     pass
 
+# load matching C shared object file for NFFT
+_libnfft = ct.CDLL(_init_paths.NFFT_PATH)  
+  
 # Define the function prototypes already known prior to runtime
 _libnfft.jnfft_init.argtypes = [ct.POINTER(_NfftPlan), ct.c_int32, ct.POINTER(ct.c_int32), ct.c_int32, 
                                ct.POINTER(ct.c_int32), ct.c_int32, ct.c_uint32, ct.c_uint32]

@@ -1,5 +1,3 @@
-import ctypes as _ctypes
-
 """
     PRE_PHI_HUT
 
