@@ -23,4 +23,4 @@ else:
     raise RuntimeError("Operating System not supported.")
 
 NFFT_PATH = _dir_path + "/nfft/libnfftjulia" + _avx_flag + _os_flag
-NFCT_PATH = _dir_path + "/nfft/libnfctjulia" + _avx_flag + _os_flag
+NFCT_PATH = _dir_path + "/nfct/libnfctjulia" + _avx_flag + _os_flag
