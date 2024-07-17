@@ -20,7 +20,7 @@ N = np.array([16,])
 M = 10000
 
 # set up data
-X = np.random.rand(M,)
+X = np.random.rand(M,) - 0.5
 fhat = np.random.rand(N[0]) +  1.0j * np.random.rand(N[0])
 
 # initialize a NFFT plan and set data
