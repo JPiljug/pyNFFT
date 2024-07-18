@@ -1,5 +1,5 @@
 # pyNFFT
-A ctypes based Python Interface for [NFFT C library](https://github.com/NFFT/nfft). The implementation is modelled after the already existing Interface to the nfft in Julia with [NFFT C library](https://github.com/NFFT/NFFT3.jl) to allow a smooth ztransition for existing users.
+A ctypes based Python Interface for [NFFT C library](https://github.com/NFFT/nfft). The implementation is modelled after the already existing Interface to the nfft in Julia with [NFFT3.jl](https://github.com/NFFT/NFFT3.jl) to allow a smooth transition for existing users.
 
 `pyNFFT` provides the following fast algorithms:
 - nonequispaced fast Fourier transform (NFFT) 
