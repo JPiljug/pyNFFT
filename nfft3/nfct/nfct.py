@@ -8,7 +8,7 @@ from .. import _init_paths
 class _NFCTPlan(ct.Structure):
     pass
 
-# load matching C shared object file for NFFT
+# load matching C shared object file for NFCT
 _libnfct = ct.CDLL(_init_paths.NFCT_PATH)  
   
 # Define the function prototypes already known prior to runtime
@@ -49,7 +49,7 @@ class NFCT:
             self._init_done = True
             self._finalized = False
         else:
-            raise RuntimeError("Invalid number of argumentes given to NFFT constructor.")
+            raise RuntimeError("Invalid number of argumentes given to NFCT constructor.")
 
     # use setters and getters to ensure correct data types 
     @property
@@ -144,7 +144,7 @@ class NFCT:
     @X.setter 
     def X(self, value):
         if self._finalized:
-            raise RuntimeError("NFFT already finalized.")
+            raise RuntimeError("NFCT already finalized.")
         if not (isinstance(value,np.ndarray) and value.dtype == np.float64 and value.flags['C']):
             raise TypeError("X has to be C-continuous, float64 numpy array.")
         if self._D == 1:
@@ -188,9 +188,9 @@ class NFCT:
 
     def trafo_direct(self):
         if not self._init_done:
-            raise RuntimeError("NFFT plan not initialized")
+            raise RuntimeError("NFCT plan not initialized")
         elif self._finalized:
-            raise RuntimeError("NFFT plan already finalized.")
+            raise RuntimeError("NFCT plan already finalized.")
         elif not hasattr(self, 'X'):
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'fhat'):
@@ -200,9 +200,9 @@ class NFCT:
 
     def trafo(self):
         if not self._init_done:
-            raise RuntimeError("NFFT plan not initialized")
+            raise RuntimeError("NFCT plan not initialized")
         elif self._finalized:
-            raise RuntimeError("NFFT plan already finalized.")
+            raise RuntimeError("NFCT plan already finalized.")
         elif not hasattr(self, 'X'):
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'fhat'):
@@ -212,9 +212,9 @@ class NFCT:
 
     def adjoint_direct(self):
         if not self._init_done:
-            raise RuntimeError("NFFT plan not initialized")
+            raise RuntimeError("NFCT plan not initialized")
         elif self._finalized:
-            raise RuntimeError("NFFT plan already finalized.")
+            raise RuntimeError("NFCT plan already finalized.")
         elif not hasattr(self, 'X'):
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'f'):
@@ -225,9 +225,9 @@ class NFCT:
 
     def adjoint(self):
         if not self._init_done:
-            raise RuntimeError("NFFT plan not initialized")
+            raise RuntimeError("NFCT plan not initialized")
         elif self._finalized:
-            raise RuntimeError("NFFT plan already finalized.")
+            raise RuntimeError("NFCT plan already finalized.")
         elif not hasattr(self, 'X'):
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'f'):
@@ -239,9 +239,9 @@ class NFCT:
     # finalization method
     def finalize(self):
         if not self._init_done:
-            raise RuntimeError("NFFT plan not initialized.")
+            raise RuntimeError("NFCT plan not initialized.")
         if self._finalized:
-            raise RuntimeError("NFFT plan already finalized.")
+            raise RuntimeError("NFCT plan already finalized.")
         _libnfct.jnfct_finalize(self._plan)
         self._finalized = True
 
