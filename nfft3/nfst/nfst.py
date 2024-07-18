@@ -4,34 +4,34 @@ import numpy as np
 from .. import flags
 from .. import _init_paths
 
-# Define  dummy structure for C nfft_plan
-class _NfftPlan(ct.Structure):
+# Define  dummy structure for C nfct_plan
+class _NFSTPlan(ct.Structure):
     pass
 
 # load matching C shared object file for NFFT
-_libnfft = ct.CDLL(_init_paths.NFFT_PATH)  
+_libnfct = ct.CDLL(_init_paths.NFST_PATH)  
   
 # Define the function prototypes already known prior to runtime
-_libnfft.jnfft_init.argtypes = [ct.POINTER(_NfftPlan), ct.c_int32, ct.POINTER(ct.c_int32), ct.c_int32, 
+_libnfct.jnfst_init.argtypes = [ct.POINTER(_NFSTPlan), ct.c_int32, ct.POINTER(ct.c_int32), ct.c_int32, 
                                ct.POINTER(ct.c_int32), ct.c_int32, ct.c_uint32, ct.c_uint32]
-_libnfft.jnfft_alloc.restype = ct.POINTER(_NfftPlan)
-_libnfft.jnfft_finalize.argtypes = [ct.POINTER(_NfftPlan)]
-_libnfft.jnfft_set_f.argtypes = [ct.POINTER(_NfftPlan), np.ctypeslib.ndpointer(np.complex128, ndim=1, flags='C')] 
-_libnfft.jnfft_set_f.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, flags='C') 
-_libnfft.jnfft_set_fhat.argtypes = [ct.POINTER(_NfftPlan), np.ctypeslib.ndpointer(np.complex128, ndim=1, flags='C')] 
-_libnfft.jnfft_set_fhat.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, flags='C') 
-_libnfft.jnfft_trafo.argtypes = [ct.POINTER(_NfftPlan)]
-_libnfft.jnfft_adjoint.argtypes = [ct.POINTER(_NfftPlan)]
-_libnfft.jnfft_trafo_direct.argtypes = [ct.POINTER(_NfftPlan)]
-_libnfft.jnfft_adjoint_direct.argtypes = [ct.POINTER(_NfftPlan)]
+_libnfct.jnfst_alloc.restype = ct.POINTER(_NFSTPlan)
+_libnfct.jnfst_finalize.argtypes = [ct.POINTER(_NFSTPlan)]
+_libnfct.jnfst_set_f.argtypes = [ct.POINTER(_NFSTPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')] 
+_libnfct.jnfst_set_f.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C') 
+_libnfct.jnfst_set_fhat.argtypes = [ct.POINTER(_NFSTPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')] 
+_libnfct.jnfst_set_fhat.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C') 
+_libnfct.jnfst_trafo.argtypes = [ct.POINTER(_NFSTPlan)]
+_libnfct.jnfst_adjoint.argtypes = [ct.POINTER(_NFSTPlan)]
+_libnfct.jnfst_trafo_direct.argtypes = [ct.POINTER(_NFSTPlan)]
+_libnfct.jnfst_adjoint_direct.argtypes = [ct.POINTER(_NFSTPlan)]
 
 
-# Python class for NFFT
-class NFFT:
+# Python class for NFCT
+class NFST:
     def __init__(self, *args):
         if len(args) == 2:
             self._N, self._M = args
-            self._plan = _libnfft.jnfft_alloc()
+            self._plan = _libnfct.jnfst_alloc()
             self._n = (2 ** (np.ceil( np.log(self.N) / np.log(2)) + 1 )).astype('int32') 
             self._m = flags.default_window_cut_off
             if self._D == 1:
@@ -39,13 +39,13 @@ class NFFT:
             else:
                 self._f1 = flags.f1_default | flags.MALLOC_X | flags.MALLOC_F_HAT | flags.MALLOC_F | flags.FFTW_INIT
             self._f2 = flags.f2_default  
-            _libnfft.jnfft_init(self._plan, self._D, self.__N, self.__M, self.__n, self.__m, self.__f1, self.__f2)
+            _libnfct.jnfst_init(self._plan, self._D, self.__N, self.__M, self.__n, self.__m, self.__f1, self.__f2)
             self._init_done = True
             self._finalized = False
         elif len(args) == 6:
             self._N, self._M, self._n, self._m, self._f1, self._f2 = args
-            self._plan = _libnfft.jnfft_alloc()
-            _libnfft.jnfft_init(self._plan, self._D, self.__N, self.__M, self.__n, self.__m, self.__f1, self.__f2)
+            self._plan = _libnfct.jnfst_alloc()
+            _libnfct.jnfst_init(self._plan, self._D, self.__N, self.__M, self.__n, self.__m, self.__f1, self.__f2)
             self._init_done = True
             self._finalized = False
         else:
@@ -150,14 +150,14 @@ class NFFT:
         if self._D == 1:
             if value.shape != (self.M, ):
                 raise RuntimeError("X has to be 1-dimensional array of shape (M,).")
-            _libnfft.jnfft_set_x.argtypes = [ct.POINTER(_NfftPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')]
-            _libnfft.jnfft_set_x.restype = np.ctypeslib.ndpointer(dtype=np.float64, ndim=1, shape=(self.M,), flags='C')
+            _libnfct.jnfst_set_x.argtypes = [ct.POINTER(_NFSTPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')]
+            _libnfct.jnfst_set_x.restype = np.ctypeslib.ndpointer(dtype=np.float64, ndim=1, shape=(self.M,), flags='C')
         else:
             if value.shape != (self.M, self._D):
                 raise RuntimeError("X has to be 2-dimensional array of shape (M,D).")
-            _libnfft.jnfft_set_x.argtypes = [ct.POINTER(_NfftPlan), np.ctypeslib.ndpointer(np.float64, ndim=2, flags='C')]
-            _libnfft.jnfft_set_x.restype = np.ctypeslib.ndpointer(dtype=np.float64, ndim=2, shape=(self.M,self._D), flags='C')
-        self._X = _libnfft.jnfft_set_x(self._plan, value)
+            _libnfct.jnfst_set_x.argtypes = [ct.POINTER(_NFSTPlan), np.ctypeslib.ndpointer(np.float64, ndim=2, flags='C')]
+            _libnfct.jnfst_set_x.restype = np.ctypeslib.ndpointer(dtype=np.float64, ndim=2, shape=(self.M,self._D), flags='C')
+        self._X = _libnfct.jnfst_set_x(self._plan, value)
     
     @property
     def f(self):
@@ -165,12 +165,12 @@ class NFFT:
     
     @f.setter 
     def f(self, value):
-        if not (isinstance(value,np.ndarray) and value.dtype == np.complex128 and value.flags['C']):
-            raise RuntimeError("f has to be C-continuous, numpy complex128 array")
+        if not (isinstance(value,np.ndarray) and value.dtype == np.float64 and value.flags['C']):
+            raise RuntimeError("f has to be C-continuous, numpy float64 array")
         if value.shape != (self.M, ):
             raise RuntimeError("f has to be 1-dimensional array of shape (M,).")  
-        _libnfft.jnfft_set_f.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, shape=(self.M,), flags='C') 
-        self._f = _libnfft.jnfft_set_f(self._plan, value)
+        _libnfct.jnfst_set_f.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(self.M,), flags='C') 
+        self._f = _libnfct.jnfst_set_f(self._plan, value)
 
     @property
     def fhat(self):
@@ -178,13 +178,13 @@ class NFFT:
     
     @fhat.setter 
     def fhat(self, value):
-        if not (isinstance(value,np.ndarray) and value.dtype == np.complex128 and value.flags['C']):
-            raise RuntimeError("fhat has to be C-continuous, numpy complex128 array") 
-        Ns = np.prod(self.N)
+        if not (isinstance(value,np.ndarray) and value.dtype == np.float64 and value.flags['C']):
+            raise RuntimeError("fhat has to be C-continuous, numpy float64 array") 
+        Ns = np.prod(self.N - 1)
         if value.shape != (Ns, ):
-            raise RuntimeError("fhat has to be 1-dimensional array of shape (np.prod(N),).") 
-        _libnfft.jnfft_set_fhat.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, shape=(Ns,), flags='C') 
-        self._fhat = _libnfft.jnfft_set_fhat(self._plan, value)   
+            raise RuntimeError("fhat has to be 1-dimensional array of shape (np.prod(N-1),).") 
+        _libnfct.jnfst_set_fhat.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(Ns,), flags='C') 
+        self._fhat = _libnfct.jnfst_set_fhat(self._plan, value)   
 
     def trafo_direct(self):
         if not self._init_done:
@@ -195,8 +195,8 @@ class NFFT:
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'fhat'):
             raise RuntimeError("fhat has not been set.")
-        _libnfft.jnfft_trafo.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, shape=(self.M,), flags='C') 
-        self.f = _libnfft.jnfft_trafo_direct(self._plan)
+        _libnfct.jnfst_trafo.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(self.M,), flags='C') 
+        self.f = _libnfct.jnfst_trafo_direct(self._plan)
 
     def trafo(self):
         if not self._init_done:
@@ -207,8 +207,8 @@ class NFFT:
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'fhat'):
             raise RuntimeError("fhat has not been set.")
-        _libnfft.jnfft_trafo.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, shape=(self.M,), flags='C') 
-        self.f = _libnfft.jnfft_trafo(self._plan)
+        _libnfct.jnfst_trafo.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(self.M,), flags='C') 
+        self.f = _libnfct.jnfst_trafo(self._plan)
 
     def adjoint_direct(self):
         if not self._init_done:
@@ -219,9 +219,9 @@ class NFFT:
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'f'):
             raise RuntimeError("f has not been set.")
-        Ns = np.prod(self.N)
-        _libnfft.jnfft_adjoint_direct.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, shape=(Ns,), flags='C') 
-        self._fhat = _libnfft.jnfft_adjoint_direct(self._plan)
+        Ns = np.prod(self.N-1)
+        _libnfct.jnfst_adjoint_direct.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(Ns,), flags='C') 
+        self._fhat = _libnfct.jnfst_adjoint_direct(self._plan)
 
     def adjoint(self):
         if not self._init_done:
@@ -232,9 +232,9 @@ class NFFT:
             raise RuntimeError("X has not been set.")
         elif not hasattr(self, 'f'):
             raise RuntimeError("f has not been set.")
-        Ns = np.prod(self.N)
-        _libnfft.jnfft_adjoint.restype = np.ctypeslib.ndpointer(np.complex128, ndim=1, shape=(Ns,), flags='C') 
-        self._fhat = _libnfft.jnfft_adjoint(self._plan)
+        Ns = np.prod(self.N-1)
+        _libnfct.jnfst_adjoint.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(Ns,), flags='C') 
+        self._fhat = _libnfct.jnfst_adjoint(self._plan)
 
     # finalization method
     def finalize(self):
@@ -242,7 +242,7 @@ class NFFT:
             raise RuntimeError("NFFT plan not initialized.")
         if self._finalized:
             raise RuntimeError("NFFT plan already finalized.")
-        _libnfft.jnfft_finalize(self._plan)
+        _libnfct.jnfst_finalize(self._plan)
         self._finalized = True
 
     # default destructor method 

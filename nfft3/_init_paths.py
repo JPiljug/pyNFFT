@@ -24,3 +24,4 @@ else:
 
 NFFT_PATH = _dir_path + "/nfft/libnfftjulia" + _avx_flag + _os_flag
 NFCT_PATH = _dir_path + "/nfct/libnfctjulia" + _avx_flag + _os_flag
+NFST_PATH = _dir_path + "/nfst/libnfstjulia" + _avx_flag + _os_flag

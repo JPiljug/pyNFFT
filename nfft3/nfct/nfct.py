@@ -5,25 +5,25 @@ from .. import flags
 from .. import _init_paths
 
 # Define  dummy structure for C nfct_plan
-class _NfctPlan(ct.Structure):
+class _NFCTPlan(ct.Structure):
     pass
 
 # load matching C shared object file for NFFT
 _libnfct = ct.CDLL(_init_paths.NFCT_PATH)  
   
 # Define the function prototypes already known prior to runtime
-_libnfct.jnfct_init.argtypes = [ct.POINTER(_NfctPlan), ct.c_int32, ct.POINTER(ct.c_int32), ct.c_int32, 
+_libnfct.jnfct_init.argtypes = [ct.POINTER(_NFCTPlan), ct.c_int32, ct.POINTER(ct.c_int32), ct.c_int32, 
                                ct.POINTER(ct.c_int32), ct.c_int32, ct.c_uint32, ct.c_uint32]
-_libnfct.jnfct_alloc.restype = ct.POINTER(_NfctPlan)
-_libnfct.jnfct_finalize.argtypes = [ct.POINTER(_NfctPlan)]
-_libnfct.jnfct_set_f.argtypes = [ct.POINTER(_NfctPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')] 
+_libnfct.jnfct_alloc.restype = ct.POINTER(_NFCTPlan)
+_libnfct.jnfct_finalize.argtypes = [ct.POINTER(_NFCTPlan)]
+_libnfct.jnfct_set_f.argtypes = [ct.POINTER(_NFCTPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')] 
 _libnfct.jnfct_set_f.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C') 
-_libnfct.jnfct_set_fhat.argtypes = [ct.POINTER(_NfctPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')] 
+_libnfct.jnfct_set_fhat.argtypes = [ct.POINTER(_NFCTPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')] 
 _libnfct.jnfct_set_fhat.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C') 
-_libnfct.jnfct_trafo.argtypes = [ct.POINTER(_NfctPlan)]
-_libnfct.jnfct_adjoint.argtypes = [ct.POINTER(_NfctPlan)]
-_libnfct.jnfct_trafo_direct.argtypes = [ct.POINTER(_NfctPlan)]
-_libnfct.jnfct_adjoint_direct.argtypes = [ct.POINTER(_NfctPlan)]
+_libnfct.jnfct_trafo.argtypes = [ct.POINTER(_NFCTPlan)]
+_libnfct.jnfct_adjoint.argtypes = [ct.POINTER(_NFCTPlan)]
+_libnfct.jnfct_trafo_direct.argtypes = [ct.POINTER(_NFCTPlan)]
+_libnfct.jnfct_adjoint_direct.argtypes = [ct.POINTER(_NFCTPlan)]
 
 
 # Python class for NFCT
@@ -150,12 +150,12 @@ class NFCT:
         if self._D == 1:
             if value.shape != (self.M, ):
                 raise RuntimeError("X has to be 1-dimensional array of shape (M,).")
-            _libnfct.jnfct_set_x.argtypes = [ct.POINTER(_NfctPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')]
+            _libnfct.jnfct_set_x.argtypes = [ct.POINTER(_NFCTPlan), np.ctypeslib.ndpointer(np.float64, ndim=1, flags='C')]
             _libnfct.jnfct_set_x.restype = np.ctypeslib.ndpointer(dtype=np.float64, ndim=1, shape=(self.M,), flags='C')
         else:
             if value.shape != (self.M, self._D):
                 raise RuntimeError("X has to be 2-dimensional array of shape (M,D).")
-            _libnfct.jnfct_set_x.argtypes = [ct.POINTER(_NfctPlan), np.ctypeslib.ndpointer(np.float64, ndim=2, flags='C')]
+            _libnfct.jnfct_set_x.argtypes = [ct.POINTER(_NFCTPlan), np.ctypeslib.ndpointer(np.float64, ndim=2, flags='C')]
             _libnfct.jnfct_set_x.restype = np.ctypeslib.ndpointer(dtype=np.float64, ndim=2, shape=(self.M,self._D), flags='C')
         self._X = _libnfct.jnfct_set_x(self._plan, value)
     
@@ -220,7 +220,7 @@ class NFCT:
         elif not hasattr(self, 'f'):
             raise RuntimeError("f has not been set.")
         Ns = np.prod(self.N)
-        _libnfct.jnfct_set_fhat.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(Ns,), flags='C') 
+        _libnfct.jnfct_adjoint_direct.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(Ns,), flags='C') 
         self._fhat = _libnfct.jnfct_adjoint_direct(self._plan)
 
     def adjoint(self):
@@ -233,7 +233,7 @@ class NFCT:
         elif not hasattr(self, 'f'):
             raise RuntimeError("f has not been set.")
         Ns = np.prod(self.N)
-        _libnfct.jnfct_set_fhat.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(Ns,), flags='C') 
+        _libnfct.jnfct_adjoint.restype = np.ctypeslib.ndpointer(np.float64, ndim=1, shape=(Ns,), flags='C') 
         self._fhat = _libnfct.jnfct_adjoint(self._plan)
 
     # finalization method

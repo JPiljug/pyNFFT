@@ -35,3 +35,11 @@ f1 = F @ fhat
 
 print(np.linalg.norm(f1-plan.f) / np.linalg.norm(f1))
 print(np.linalg.norm(f1-plan.f,np.inf) / np.linalg.norm(fhat, 1))
+
+# test adjoint
+plan.adjoint()
+
+f2 = np.conj(F).T @ plan.f
+
+print(np.linalg.norm(f2-plan.fhat) / np.linalg.norm(f1))
+print(np.linalg.norm(f2-plan.fhat,np.inf) / np.linalg.norm(fhat, 1))
